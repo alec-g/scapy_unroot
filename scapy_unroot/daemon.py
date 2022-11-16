@@ -223,7 +223,7 @@ class UnrootDaemon:
                                         ts, client.ins.getpeername())
                             )
                             data = base64.b64encode(data_raw)
-                            print(data_raw.decode())
+                            print(data_raw)
                             client.ins.send(json.dumps({"recv": {
                                 "type": ll.__name__,
                                 "data": data.decode(),
