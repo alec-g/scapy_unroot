@@ -153,7 +153,8 @@ class ScapyUnrootSocket(SuperSocket):
         while "recv" not in res:
             res = json.loads(self.ins.recv(daemon.DAEMON_MTU))
             if "recv" not in res:
-                logger.error("Received unexpected JSON object {}".format(res))
+                print("Received unexpected JSON object {}".format(res))
+        print(res)
         obj = res["recv"]
         if obj is None:
             return scapy.layers.all.raw, b"", None
