@@ -7,5 +7,5 @@ from scapy.all import sniff
 configure_sockets()
 
 if __name__ == "__main__":
-  packets = sniff(count=5)
+  packets = sniff(filter="host %s" % ('google.com'), count=5)
   print(packets)

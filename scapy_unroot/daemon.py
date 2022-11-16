@@ -77,12 +77,12 @@ def _is_closed_resp(resp):
 class UnrootDaemon:
     def __init__(self, group, daemonize=False, run_dir=RUN_DIR_DEFAULT,
                  interface_blacklist=None, logger=None):
-        if logger is None:
-            module = self.__class__.__module__
-            name = self.__class__.__name__
-            if module is not None:
-                name = "%s.%s" % (module, name)
-            self.logger = logging.getLogger(name)
+        # if logger is None:
+        #     module = self.__class__.__module__
+        #     name = self.__class__.__name__
+        #     if module is not None:
+        #         name = "%s.%s" % (module, name)
+        #     self.logger = logging.getLogger(name)
         self.group = grp.getgrnam(group).gr_gid
         self.daemonize = daemonize
         self.run_dir = run_dir
@@ -100,7 +100,8 @@ class UnrootDaemon:
                 # exit first parent
                 sys.exit(0)
         except OSError as exc:
-            self.logger.error("fork #%s failed: %s (%s)" % (num, exc.errno, exc.strerror))
+            print("fork #%s failed: %s (%s)" % (num, exc.errno, exc.strerror))
+            # self.logger.error("fork #%s failed: %s (%s)" % (num, exc.errno, exc.strerror))
             sys.exit(1)
 
     def _create_pidfile(self):
@@ -216,7 +217,7 @@ class UnrootDaemon:
                     if isinstance(client, UnrootDaemonClient):
                         try:
                             ll, data_raw, ts = sock.recv_raw(MTU)
-                            self.logger.info(
+                            print(
                                 "Sending %s(%s) (ts=%s) to %s"
                                 % (ll.__name__, data_raw,
                                         ts, client.ins.getpeername())
@@ -231,7 +232,7 @@ class UnrootDaemon:
                         except ConnectionError:
                             self.close_client(client)
                     else:
-                        self.logger.error("Unexpected socket selected %s"
+                        print("Unexpected socket selected %s"
                                           % (sock))
 
     def remove_client(self, client):
@@ -330,7 +331,7 @@ class UnrootDaemonClient:
             try:
                 self.supersocket.close()
             except Exception as exc:
-                self.daemon.logger.warning("Error on closing %s (%s)"
+                print("Error on closing %s (%s)"
                                            % (self.supersocket, exc))
         return _closed_resp(str(self.address))
 
