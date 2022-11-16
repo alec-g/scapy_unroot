@@ -11,6 +11,9 @@
 # scapy-unroot
 Daemon and tooling to enable using [scapy] without root permissions.
 
+This is a Python2.7 fork as the original version only currently support python >=3.6
+all functionality remains the same
+
 ## Installation
 `scapy_unroot` can be installed by just running
 
