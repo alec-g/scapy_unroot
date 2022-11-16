@@ -22,8 +22,10 @@ import logging
 import os
 import socket
 import tempfile
+import shutil
 
 from scapy.all import conf, MTU, Scapy_Exception, SuperSocket
+from scapy.interfaces import resolve_iface
 import scapy.layers.all
 
 from . import daemon
@@ -37,7 +39,6 @@ ERR_EXCEPTIONS = {
     daemon.OS: lambda errno=None, msg="", **args: OSError(errno, msg),
 }
 logger = logging.getLogger(__name__)
-
 
 class ScapyUnrootSocket(SuperSocket):
     _count = 0
@@ -54,6 +55,13 @@ class ScapyUnrootSocket(SuperSocket):
             req["data"] = base64.b64encode(data).decode()
         if len(args) > 0:
             req["args"] = args
+
+            if 'iface' in req['args']:
+                iface = str(resolve_iface(req['args']['iface']))
+                req['args']['iface'] = iface
+
+        print(req)
+
         self.command_socket.send(
             json.dumps(req, separators=(",", ":")).encode()
         )
@@ -65,14 +73,14 @@ class ScapyUnrootSocket(SuperSocket):
                 raise ERR_EXCEPTIONS[err_type](**resp["error"])
             else:
                 raise RuntimeError("Unexpected error code {} from daemon"
-                                   .format(err_type))
+                                .format(err_type))
         elif "success" in resp:
             return resp["success"]
         elif "closed" in resp:
             return 0
         else:
             raise RuntimeError("Unexpected response from daemon '{}'"
-                               .format(self.server_addr))
+                            .format(self.server_addr))
 
     def _acquire_socket_lock(self):
         lock = open(os.path.join(self.socket_dir, "socket.lock"), "a+")
@@ -123,7 +131,7 @@ class ScapyUnrootSocket(SuperSocket):
             logger.warning("Exception on sending close to daemon '{}'"
                            .format(e))
         self.command_socket.close()
-        super().close()
+        super(ScapyUnrootSocket, self).close()
 
     def send(self, x):
         if self.outs is None:
@@ -172,15 +180,15 @@ def configure_sockets(server_addr=None, socket_dir=None,
     if server_addr is None:
         server_addr = os.path.join(daemon.RUN_DIR_DEFAULT, "server-socket")
     if socket_dir is None:
-        _socket_dir = tempfile.TemporaryDirectory(
+        _socket_dir = tempfile.mkdtemp(
                 prefix="scapy_unroot.sockets."
             )
 
         def _remove_socket_dir():
-            _socket_dir.cleanup()
+            shutil.rmtree(_socket_dir)
 
         atexit.register(_remove_socket_dir)
-        socket_dir = _socket_dir.name
+        socket_dir = _socket_dir
     for socket_conf in ["L2listen", "L2socket", "L3socket", "L3socket6"]:
         setattr(conf, socket_conf,
                 functools.partial(ScapyUnrootSocket, server_addr, socket_dir,

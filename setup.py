@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
@@ -76,6 +76,6 @@ setup(
     ],
 
     install_requires=list(get_requirements()),
-    python_requires=">=3.6",
+    python_requires=">=2.7",
     test_suite="tests"
 )

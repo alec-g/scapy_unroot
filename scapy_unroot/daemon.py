@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
@@ -81,7 +81,7 @@ class UnrootDaemon:
             module = self.__class__.__module__
             name = self.__class__.__name__
             if module is not None:
-                name = "{}.{}".format(module, name)
+                name = "%s.%s" % (module, name)
             self.logger = logging.getLogger(name)
         self.group = grp.getgrnam(group).gr_gid
         self.daemonize = daemonize
@@ -100,8 +100,7 @@ class UnrootDaemon:
                 # exit first parent
                 sys.exit(0)
         except OSError as exc:
-            self.logger.error("fork #{} failed: {exc.errno} ({exc.strerror})"
-                              .format(num, exc=exc))
+            self.logger.error("fork #%s failed: %s (%s)" % (num, exc.errno, exc.strerror))
             sys.exit(1)
 
     def _create_pidfile(self):
@@ -111,7 +110,7 @@ class UnrootDaemon:
         pid = os.getpid()
         # write pidfile
         with open(self.pidfile, "w+") as f:
-            print("{}".format(pid), file=f)
+            print("%s" % (pid))
 
     def _delete_pidfile(self):
         if hasattr(self, "pidfile") and self.pidfile and \
@@ -163,7 +162,7 @@ class UnrootDaemon:
             return client.close_supersocket()
         else:
             return _error_resp(
-                UNKNOWN_OP, "Operation '{}' unknown".format(op)
+                UNKNOWN_OP, "Operation '%s' unknown" % (op)
             )
 
     @property
@@ -182,7 +181,7 @@ class UnrootDaemon:
         self.socket.listen(1024)
         self.read_sockets[self.socket] = "server_socket"
         while True:
-            sockets, _ = SuperSocket.select(
+            sockets = SuperSocket.select(
                 set(self.read_sockets) | set(self.clients)
             )
             for sock in sockets:
@@ -218,8 +217,8 @@ class UnrootDaemon:
                         try:
                             ll, data_raw, ts = sock.recv_raw(MTU)
                             self.logger.info(
-                                "Sending {}({}) (ts={}) to {}"
-                                .format(ll.__name__, data_raw,
+                                "Sending %s(%s) (ts=%s) to %s"
+                                % (ll.__name__, data_raw,
                                         ts, client.ins.getpeername())
                             )
                             data = base64.b64encode(data_raw)
@@ -232,8 +231,8 @@ class UnrootDaemon:
                         except ConnectionError:
                             self.close_client(client)
                     else:
-                        self.logger.error("Unexpected socket selected {}"
-                                          .format(sock))
+                        self.logger.error("Unexpected socket selected %s"
+                                          % (sock))
 
     def remove_client(self, client):
         self.clients.pop(client.socket, None)
@@ -301,24 +300,24 @@ class UnrootDaemonClient:
         else:
             return _error_resp(
                 UNKNOWN_TYPE,
-                "Unknown socket type '{}'".format(type)
+                "Unknown socket type '%s'" % (type)
             )
 
     def send_via_supersocket(self, type="raw", data=""):
         if not self.is_supersocket_initialized():
             return _error_resp(
                 UNINITILIZED,
-                "Socket for '{}' is uninitialized".format(self.address)
+                "Socket for '%s' is uninitialized" % (self.address)
             )
         try:
             bytes = base64.b64decode(data.encode())
         except binascii.Error:
             return _error_resp(
-                INVALID_DATA, "data '{}' is not base64 encoded".format(data)
+                INVALID_DATA, "data '%s' is not base64 encoded" % (data)
             )
         if not hasattr(layers, type):
             return _error_resp(
-                UNKNOWN_TYPE, "Unknown packet type {}".format(type)
+                UNKNOWN_TYPE, "Unknown packet type %s" % (type)
             )
         try:
             res = self.supersocket.send(getattr(layers, type)(bytes))
@@ -331,8 +330,8 @@ class UnrootDaemonClient:
             try:
                 self.supersocket.close()
             except Exception as exc:
-                self.daemon.logger.warning("Error on closing {} ({})"
-                                           .format(self.supersocket, exc))
+                self.daemon.logger.warning("Error on closing %s (%s)"
+                                           % (self.supersocket, exc))
         return _closed_resp(str(self.address))
 
 
