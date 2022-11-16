@@ -60,7 +60,7 @@ class ScapyUnrootSocket(SuperSocket):
                 iface = str(resolve_iface(req['args']['iface']))
                 req['args']['iface'] = iface
 
-        print(req)
+        # print(req)
 
         self.command_socket.send(
             json.dumps(req, separators=(",", ":")).encode()
@@ -160,6 +160,7 @@ class ScapyUnrootSocket(SuperSocket):
             return scapy.layers.all.raw, b"", None
         if "data" in obj:
             data = base64.b64decode(obj["data"])[:x]
+            print("Data: ", data)
         else:
             data = b""
         if "type" in obj:
