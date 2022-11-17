@@ -154,12 +154,12 @@ class ScapyUnrootSocket(SuperSocket):
             res = json.loads(self.ins.recv(daemon.DAEMON_MTU))
             if "recv" not in res:
                 print("Received unexpected JSON object {}".format(res))
-        print(res)
         obj = res["recv"]
         if obj is None:
             return scapy.layers.all.raw, b"", None
         if "data" in obj:
             data = base64.b64decode(obj["data"])[:x]
+            print("GOT DATA: ", data)
         else:
             data = b""
         if "type" in obj:
