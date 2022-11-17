@@ -153,7 +153,7 @@ class ScapyUnrootSocket(SuperSocket):
         res = {}
         while "recv" not in res:
             try:
-                recv = self.ins.recv(daemon.DAEMON_MTU)
+                recv = self.ins.recv(MTU)
                 print(recv)
                 # split = re.split('\}{+', recv)
 
