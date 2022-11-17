@@ -153,7 +153,7 @@ class ScapyUnrootSocket(SuperSocket):
         res = {}
         buffer = ""
         while "recv" not in res:
-            buffer += self.ins.recv()
+            buffer += self.ins.recv(1)
             
             print(buffer)
             if "}}" in buffer:
