@@ -153,12 +153,13 @@ class ScapyUnrootSocket(SuperSocket):
         res = {}
         while "recv" not in res:
             try:
-                recv = self.ins.recv(MTU)
+                recv = self.ins.recv(daemon.DAEMON_MTU)
+                print(recv)
                 # split = re.split('\}{+', recv)
 
                 res = json.loads(recv)
             except ValueError:
-                print(recv)
+                print("FAILED!")
 
             if "recv" not in res:
                 print("Received unexpected JSON object {}".format(res))
