@@ -151,18 +151,25 @@ class ScapyUnrootSocket(SuperSocket):
         if x < 0:
             raise ValueError("negative buffersize in recv")
         res = {}
+        buffer = ""
         while "recv" not in res:
-            try:
-                recv = self.ins.recv(MTU)
-                print(recv)
-                # split = re.split('\}{+', recv)
+            buffer += self.ins.recv()
+            
+            print(buffer)
+            if "}}" in buffer:
+                res = json.loads(buffer)
 
-                res = json.loads(recv)
-            except ValueError:
-                print("FAILED!")
+            # try:
+            #     recv = self.ins.recv(MTU)
+            #     print(recv)
+            #     # split = re.split('\}{+', recv)
 
-            if "recv" not in res:
-                print("Received unexpected JSON object {}".format(res))
+            #     res = json.loads(recv)
+            # except ValueError:
+            #     print("FAILED!")
+
+            # if "recv" not in res:
+            #     print("Received unexpected JSON object {}".format(res))
         obj = res["recv"]
         if obj is None:
             return scapy.layers.all.raw, b"", None
