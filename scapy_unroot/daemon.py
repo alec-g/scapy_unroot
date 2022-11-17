@@ -217,11 +217,11 @@ class UnrootDaemon:
                     if isinstance(client, UnrootDaemonClient):
                         try:
                             ll, data_raw, ts = sock.recv_raw(MTU)
-                            print(
-                                "Sending %s(%s) (ts=%s) to %s"
-                                % (ll.__name__, data_raw,
-                                        ts, client.ins.getpeername())
-                            )
+                            # print(
+                            #     "Sending %s(%s) (ts=%s) to %s"
+                            #     % (ll.__name__, data_raw,
+                            #             ts, client.ins.getpeername())
+                            # )
                             data = base64.b64encode(data_raw)
                             client.ins.send(json.dumps({"recv": {
                                 "type": ll.__name__,
