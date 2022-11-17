@@ -155,7 +155,6 @@ class ScapyUnrootSocket(SuperSocket):
         while "recv" not in res:
             buffer += self.ins.recv(1)
             
-            print(buffer)
             if "}}" in buffer:
                 res = json.loads(buffer)
 
@@ -170,6 +169,7 @@ class ScapyUnrootSocket(SuperSocket):
 
             # if "recv" not in res:
             #     print("Received unexpected JSON object {}".format(res))
+
         obj = res["recv"]
         if obj is None:
             return scapy.layers.all.raw, b"", None
